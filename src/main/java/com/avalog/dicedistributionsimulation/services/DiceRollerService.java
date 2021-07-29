@@ -7,6 +7,7 @@ import com.avalog.dicedistributionsimulation.dto.response.DiceRollerDto;
 import com.avalog.dicedistributionsimulation.dto.response.DiceSimulationDto;
 
 import com.avalog.dicedistributionsimulation.dto.response.ProbabilityDistributionDto;
+import com.avalog.dicedistributionsimulation.exception.DiceSimulationException;
 import com.avalog.dicedistributionsimulation.mapper.CombinationMapper;
 import com.avalog.dicedistributionsimulation.mapper.ProbabilityDistributionMapper;
 import com.avalog.dicedistributionsimulation.model.DiceDistributionRecord;
@@ -26,6 +27,9 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static com.avalog.dicedistributionsimulation.exception.ErrorType.*;
+import static java.util.Objects.isNull;
 
 
 @RequiredArgsConstructor
@@ -52,6 +56,10 @@ public class DiceRollerService {
 
     List<Integer> diceRollList = new ArrayList<>();
     diceRollerCalculator(numberOfRolls, numOfDice, numOfSide).forEach(diceRollList::add);
+    if (diceRollList.isEmpty()) {
+      log.info("dice roller doesn't work properly.");
+      throw new DiceSimulationException(EMPTY_DICE_SUM_LIST);
+    }
 
     List<DiceRollerDto> diceRollerDtoList = getTimesOfRollerSum(diceRollList);
 
@@ -103,6 +111,9 @@ public class DiceRollerService {
 
   private void saveDiceRollerRecords(Simulation simulation, List<DiceRollerDto> diceRollerDtoList) {
     Simulation savedSimulation = saveSimulation(simulation);
+    if (isNull(savedSimulation)) {
+      throw new DiceSimulationException(SIMULATION_NOT_SAVED);
+    }
     saveDistributionRecord(diceRollerDtoList, savedSimulation);
   }
 
@@ -130,7 +141,7 @@ public class DiceRollerService {
           Random random = SecureRandom.getInstanceStrong();
           return random.nextInt(n) + 1;
         } catch (NoSuchAlgorithmException e) {
-          return 10;
+          throw new DiceSimulationException(DICE_ROLLER_SUM_CALLCULATION);
         }
       };
 

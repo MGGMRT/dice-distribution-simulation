@@ -16,6 +16,7 @@ import com.avalog.dicedistributionsimulation.repository.SimulationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -41,7 +42,7 @@ public class DiceRollerService {
 
   private final ProbabilityDistributionMapper probabilityDistributionMapper;
 
-  //    @Transactional()
+  @Transactional()
   public DiceSimulationDto diceRollerList(int numberOfRolls, int numOfDice, int numOfSide) {
     log.info(
         "dice roller proccess is started. number of rolles {} , number of Dice {}, "

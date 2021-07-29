@@ -5,7 +5,6 @@ import com.avalog.dicedistributionsimulation.dto.IProbabilityDistribution;
 import com.avalog.dicedistributionsimulation.dto.response.CombinationDto;
 import com.avalog.dicedistributionsimulation.dto.response.DiceRollerDto;
 import com.avalog.dicedistributionsimulation.dto.response.DiceSimulationDto;
-
 import com.avalog.dicedistributionsimulation.dto.response.ProbabilityDistributionDto;
 import com.avalog.dicedistributionsimulation.exception.DiceSimulationException;
 import com.avalog.dicedistributionsimulation.mapper.CombinationMapper;
@@ -16,9 +15,7 @@ import com.avalog.dicedistributionsimulation.repository.DiceDistributionRecordRe
 import com.avalog.dicedistributionsimulation.repository.SimulationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -30,7 +27,6 @@ import java.util.stream.IntStream;
 
 import static com.avalog.dicedistributionsimulation.exception.ErrorType.*;
 import static java.util.Objects.isNull;
-
 
 @RequiredArgsConstructor
 @Service
@@ -45,7 +41,7 @@ public class DiceRollerService {
 
   private final ProbabilityDistributionMapper probabilityDistributionMapper;
 
-  @Transactional()
+  //    @Transactional()
   public DiceSimulationDto diceRollerList(int numberOfRolls, int numOfDice, int numOfSide) {
     log.info(
         "dice roller proccess is started. number of rolles {} , number of Dice {}, "
@@ -56,10 +52,6 @@ public class DiceRollerService {
 
     List<Integer> diceRollList = new ArrayList<>();
     diceRollerCalculator(numberOfRolls, numOfDice, numOfSide).forEach(diceRollList::add);
-    if (diceRollList.isEmpty()) {
-      log.info("dice roller doesn't work properly.");
-      throw new DiceSimulationException(EMPTY_DICE_SUM_LIST);
-    }
 
     List<DiceRollerDto> diceRollerDtoList = getTimesOfRollerSum(diceRollList);
 
@@ -71,6 +63,7 @@ public class DiceRollerService {
             .build();
 
     saveDiceRollerRecords(simulation, diceRollerDtoList);
+
     return DiceSimulationDto.builder()
         .numOfDiceSide(numOfSide)
         .numOfDice(numOfDice)
@@ -91,6 +84,20 @@ public class DiceRollerService {
         .boxed()
         .collect(Collectors.toList());
   }
+
+  private Function<Integer, Integer> diceRandomNumberGenerator =
+      (n) -> {
+        try {
+          Random random = SecureRandom.getInstanceStrong();
+          return random.nextInt(n) + 1;
+        } catch (NoSuchAlgorithmException e) {
+          throw new DiceSimulationException(DICE_ROLLER_SUM_CALLCULATION);
+        }
+      };
+
+  private BiFunction<Integer, Integer, Integer> rolledDiceSideSum =
+      (numOfDice, numOfSide) ->
+          IntStream.range(0, numOfDice).map(i -> diceRandomNumberGenerator.apply(numOfSide)).sum();
 
   private List<DiceRollerDto> getTimesOfRollerSum(List<Integer> diceRollSumList) {
     Map<Integer, Long> aggregatedDiceRollSumValue =
@@ -133,33 +140,23 @@ public class DiceRollerService {
                     .sumRolledNumberDice(item.getSumOfRolledDice())
                     .build())
         .forEach(diceDistributionRecordRepository::save);
+
+    diceDistributionRecordRepository
+        .findById(Long.valueOf(savedSimulation.getSimulationId()))
+        .orElseThrow(() -> new DiceSimulationException(DICE_DISTRIBUTION_RECORD_NOT_SAVED));
   }
-
-  private Function<Integer, Integer> diceRandomNumberGenerator =
-      (n) -> {
-        try {
-          Random random = SecureRandom.getInstanceStrong();
-          return random.nextInt(n) + 1;
-        } catch (NoSuchAlgorithmException e) {
-          throw new DiceSimulationException(DICE_ROLLER_SUM_CALLCULATION);
-        }
-      };
-
-  private BiFunction<Integer, Integer, Integer> rolledDiceSideSum =
-      (numOfDice, numOfSide) ->
-          IntStream.range(0, numOfDice).map(i -> diceRandomNumberGenerator.apply(numOfSide)).sum();
 
   public List<CombinationDto> getCombinationList() {
     Collection<ICombination> simulationByDiceCountAndDiceSide =
-            simulationRepository.findSimulationByDiceCountAndDiceSide();
+        simulationRepository.findSimulationByDiceCountAndDiceSide();
     return combinationMapper.toListSimulationStatisticsDtoList(
-            (List<ICombination>) simulationByDiceCountAndDiceSide);
+        (List<ICombination>) simulationByDiceCountAndDiceSide);
   }
 
   public List<ProbabilityDistributionDto> getProbabilityList() {
     Collection<IProbabilityDistribution> relativeDistribution =
-            diceDistributionRecordRepository.findRelativeDistribution();
+        diceDistributionRecordRepository.findRelativeDistribution();
     return probabilityDistributionMapper.toProbabilityDistributionDtoList(
-            (List<IProbabilityDistribution>) relativeDistribution);
+        (List<IProbabilityDistribution>) relativeDistribution);
   }
 }

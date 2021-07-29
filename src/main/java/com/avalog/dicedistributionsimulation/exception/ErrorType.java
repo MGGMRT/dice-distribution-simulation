@@ -20,7 +20,9 @@ public enum ErrorType {
   DICE_ROLLER_SUM_CALLCULATION(
       "100004",
       "Dice roll calculation problem. please contact consumer service. ",
-      INTERNAL_SERVER_ERROR);
+      INTERNAL_SERVER_ERROR),
+  DICE_DISTRIBUTION_RECORD_NOT_SAVED(
+      "100005", "Dice distribution record not saved, please contact consumer service. ", INTERNAL_SERVER_ERROR);
 
   private String code;
   private String message;

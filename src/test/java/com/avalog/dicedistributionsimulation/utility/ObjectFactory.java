@@ -5,7 +5,10 @@ import com.avalog.dicedistributionsimulation.dto.ICombination;
 import com.avalog.dicedistributionsimulation.dto.IProbabilityDistribution;
 import com.avalog.dicedistributionsimulation.dto.response.CombinationDto;
 import com.avalog.dicedistributionsimulation.dto.response.ProbabilityDistributionDto;
+import com.avalog.dicedistributionsimulation.model.DiceDistributionRecord;
+import com.avalog.dicedistributionsimulation.model.Simulation;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -13,6 +16,13 @@ import java.util.List;
 public class ObjectFactory {
 
   private static final String percentage = "12.79%";
+
+  public static final int DEFAULT_DICE_ROLL_NUMBER = 100;
+  public static final int DEFAULT_DICE_NUMBER = 3;
+  public static final int DEFAULT_DICE_SIDES_NUMBER = 6;
+
+  public static LocalDateTime localDateTime = LocalDateTime.now();
+
 
   public static List<CombinationDto> buildCombinationDtoList() {
     CombinationDto combinationDto =
@@ -83,4 +93,23 @@ public class ObjectFactory {
 
   public static final Collection<IProbabilityDistribution> iProbabilityList =
       (Collection<IProbabilityDistribution>) Arrays.asList(iProbabilityDistribution);
+
+  public static Simulation getSimulation() {
+      return Simulation.builder()
+              .simulationId(0)
+              .diceCount(3)
+              .numberOfRolls(100)
+              .diceSides(6)
+              .createdTime(null)
+              .build();
+  }
+
+  public static DiceDistributionRecord getDiceDistributionRecord() {
+      return DiceDistributionRecord.builder()
+              .sumRolledNumberDice(12)
+              .rolledTimes(100)
+              .simulationId(1)
+              .createdTime(localDateTime)
+              .build();
+  }
 }

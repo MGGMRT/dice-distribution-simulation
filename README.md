@@ -20,7 +20,7 @@ REST APIs implemented using JDK 11 / Spring Boot (version 2.5.3) H2 database Mav
 * Building jar in `dice-distribution-simulation/target/` folder.
 * Once successfully built, run the service by using the following command:
 ```
-java -jar  dice-simulation-v1.0.0-SNAPSHOT.jar
+java -jar  dice-distribution-simulation-v1.0.0-SNAPSHOT.jar
 ```
 # REST API DOCUMENTATION
 
@@ -35,7 +35,7 @@ Dice roller simulation has 3 endpoints
 
 # SYSTEM OVERVIEW
 
-Statless Restful Api is desing on the system. It means the server does not store any state about the client session on the server side. 
+Stateless Restful Api is desing on the system. It means the server does not store any state about the client session on the server side. 
 There are some very noticeable advantage for having REST APIs stateless:
 
 * Statelessness helps in scaling the APIs to millions of concurrent users by deploying it to multiple servers. Any server can handle any request because there is no session related dependency.

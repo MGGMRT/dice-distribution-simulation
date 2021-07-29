@@ -1,23 +1,23 @@
 package com.avalog.dicedistributionsimulation.controller;
 
+import com.avalog.dicedistributionsimulation.dto.response.CombinationDto;
 import com.avalog.dicedistributionsimulation.dto.response.DiceSimulationDto;
+import com.avalog.dicedistributionsimulation.dto.response.ProbabilityDistributionDto;
 import com.avalog.dicedistributionsimulation.services.DiceRollerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+import java.util.List;
+
 import static com.avalog.dicedistributionsimulation.constants.DiceSimulationConstants.*;
-import static com.avalog.dicedistributionsimulation.constants.RestApiUrlConstants.BASE;
-import static com.avalog.dicedistributionsimulation.constants.RestApiUrlConstants.ROLLING_DICES;
+import static com.avalog.dicedistributionsimulation.constants.RestApiUrlConstants.*;
 
 @RestController
 @RequestMapping(BASE)
@@ -43,5 +43,18 @@ public class DiceRollerController {
         DiceSimulationDto diceRollerDtoList =
                 diceRollerService.diceRollerList(numberOfRolls, numOfDice, numOfSide);
         return ResponseEntity.ok(diceRollerDtoList);
+    }
+
+    @GetMapping(path = LIST_OF_COMBINATION, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CombinationDto>> getlistOfCombinations() {
+        List<CombinationDto> combinationDtoList = diceRollerService.getCombinationList();
+        return ResponseEntity.ok(combinationDtoList);
+    }
+
+    @GetMapping(path = PROBABILITY, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ProbabilityDistributionDto>> getListOfProbabilty() {
+        List<ProbabilityDistributionDto> probabilityDistributionDtoList =
+                diceRollerService.getProbabilityList();
+        return ResponseEntity.ok(probabilityDistributionDtoList);
     }
 }

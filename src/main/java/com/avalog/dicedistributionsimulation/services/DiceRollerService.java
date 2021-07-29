@@ -1,8 +1,14 @@
 package com.avalog.dicedistributionsimulation.services;
 
+import com.avalog.dicedistributionsimulation.dto.ICombination;
+import com.avalog.dicedistributionsimulation.dto.IProbabilityDistribution;
+import com.avalog.dicedistributionsimulation.dto.response.CombinationDto;
 import com.avalog.dicedistributionsimulation.dto.response.DiceRollerDto;
 import com.avalog.dicedistributionsimulation.dto.response.DiceSimulationDto;
 
+import com.avalog.dicedistributionsimulation.dto.response.ProbabilityDistributionDto;
+import com.avalog.dicedistributionsimulation.mapper.CombinationMapper;
+import com.avalog.dicedistributionsimulation.mapper.ProbabilityDistributionMapper;
 import com.avalog.dicedistributionsimulation.model.DiceDistributionRecord;
 import com.avalog.dicedistributionsimulation.model.Simulation;
 import com.avalog.dicedistributionsimulation.repository.DiceDistributionRecordRepository;
@@ -21,7 +27,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.util.Objects.isNull;
 
 @RequiredArgsConstructor
 @Service
@@ -32,6 +37,9 @@ public class DiceRollerService {
 
   private final DiceDistributionRecordRepository diceDistributionRecordRepository;
 
+  private final CombinationMapper combinationMapper;
+
+  private final ProbabilityDistributionMapper probabilityDistributionMapper;
 
   @Transactional()
   public DiceSimulationDto diceRollerList(int numberOfRolls, int numOfDice, int numOfSide) {
@@ -129,4 +137,18 @@ public class DiceRollerService {
   private BiFunction<Integer, Integer, Integer> rolledDiceSideSum =
       (numOfDice, numOfSide) ->
           IntStream.range(0, numOfDice).map(i -> diceRandomNumberGenerator.apply(numOfSide)).sum();
+
+  public List<CombinationDto> getCombinationList() {
+    Collection<ICombination> simulationByDiceCountAndDiceSide =
+            simulationRepository.findSimulationByDiceCountAndDiceSide();
+    return combinationMapper.toListSimulationStatisticsDtoList(
+            (List<ICombination>) simulationByDiceCountAndDiceSide);
+  }
+
+  public List<ProbabilityDistributionDto> getProbabilityList() {
+    Collection<IProbabilityDistribution> relativeDistribution =
+            diceDistributionRecordRepository.findRelativeDistribution();
+    return probabilityDistributionMapper.toProbabilityDistributionDtoList(
+            (List<IProbabilityDistribution>) relativeDistribution);
+  }
 }

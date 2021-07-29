@@ -17,7 +17,7 @@ REST APIs implemented using JDK 11 / Spring Boot (version 2.5.3) H2 database Mav
 # How to Run   
 
 * Build the project by running `mvn clean package` 
-* Building jar in `dice-simulation/target/` folder.
+* Building jar in `dice-distribution-simulation/target/` folder.
 * Once successfully built, run the service by using the following command:
 ```
 java -jar  dice-simulation-v1.0.0-SNAPSHOT.jar

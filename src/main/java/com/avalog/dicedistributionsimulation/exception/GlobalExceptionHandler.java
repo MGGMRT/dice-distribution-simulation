@@ -11,6 +11,8 @@ import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.avalog.dicedistributionsimulation.exception.ErrorType.INVALID_PARAMETER_ERROR;
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -21,30 +23,30 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     String type = ex.getRequiredType().getSimpleName();
     Object value = ex.getValue();
     String message = String.format("'%s' should be a valid '%s' and '%s' isn't", name, type, value);
-    Error error = new Error(ErrorType.INVALID_PARAMETER_ERROR.getCode(), message, name);
-    return ResponseEntity.badRequest().body(error);
+    ErrorInfo errorInfo = new ErrorInfo(INVALID_PARAMETER_ERROR.getCode(),message, name);
+    return ResponseEntity.badRequest().body(errorInfo);
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
   public ResponseEntity<Object> handleConstraintViolationException(
       ConstraintViolationException ex) {
-    List<Error> errorList =
+    List<ErrorInfo> errorList =
         ex.getConstraintViolations().stream()
             .map(
                 er ->
-                    new Error(
-                        ErrorType.INVALID_PARAMETER_ERROR.getCode(),
+                    new ErrorInfo(
+                        INVALID_PARAMETER_ERROR.getCode(),
                         er.getMessage(),
                         er.getPropertyPath().toString()))
             .collect(Collectors.toList());
-    return ResponseEntity.badRequest().body(new ErrorList(errorList));
+    return ResponseEntity.badRequest().body(new ErrorInfoList(errorList));
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Object> handleException(Exception ex) {
     log.error("Error occurred. {} ", ex.getMessage());
-    Error error =
-        new Error(ErrorType.INTERNAL_ERROR.getCode(), ErrorType.INTERNAL_ERROR.getMessage(), null);
+    ErrorInfo error =
+        new ErrorInfo(ErrorType.INTERNAL_ERROR.getCode(), ErrorType.INTERNAL_ERROR.getMessage(), null);
     return ResponseEntity.internalServerError().body(error);
   }
 }

@@ -16,5 +16,5 @@ public class DiceSimulationDto {
   int numOfRolls;
   int numOfDice;
   int numOfDiceSide;
-  List<DiceRollerDto> rollingDice;
+  List<DiceRolledDto> rollingDice;
 }

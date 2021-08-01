@@ -11,8 +11,14 @@ import org.springframework.stereotype.Component;
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
-public class Error {
+public class ErrorInfo {
   private String code;
   private String description;
   private String field;
+
+  public ErrorInfo( String description, String field) {
+    this.description = description;
+    this.field = field;
+  }
+
 }

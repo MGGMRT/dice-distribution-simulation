@@ -13,6 +13,6 @@ import java.util.List;
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErrorList {
-  private List<Error> errors;
+public class ErrorInfoList {
+  private List<ErrorInfo> errors;
 }

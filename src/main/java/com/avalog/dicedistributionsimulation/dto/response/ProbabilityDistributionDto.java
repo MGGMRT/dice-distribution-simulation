@@ -13,6 +13,6 @@ import lombok.RequiredArgsConstructor;
 @Schema(name = "ProbabilityDistributionDto")
 public class ProbabilityDistributionDto {
   int sumOfRolledDice;
-  int times;
+  long times;
   String percent;
 }

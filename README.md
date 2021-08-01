@@ -22,6 +22,14 @@ REST APIs implemented using JDK 11 / Spring Boot (version 2.5.3) H2 database Mav
 ```
 java -jar  dice-distribution-simulation-v1.0.0-SNAPSHOT.jar
 ```
+# Creating a Docker Image
+The dice distribution simulation could be run within a container in a Kubernetes system. 
+To produce this container a docker image of dice distribution simulation machine must be created.
+
+` docker build -t dice-distribution-simulation:lates .`
+This will create a docker image with a tag on the local docker machine. We can push the image 
+an artifactory with using `docker push` command.
+
 # REST API DOCUMENTATION
 
 To reach the full API documantation, please use the link : `http://localhost:8080/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/`
@@ -35,7 +43,7 @@ Dice roller simulation has 3 endpoints
 
 # SYSTEM OVERVIEW
 
-Stateless Restful Api is desing on the system. It means the server does not store any state about the client session on the server side. 
+MVC design pattern and stateless beans are used on the project. It means the server does not store any state about the client session on the server side. 
 There are some very noticeable advantage for having REST APIs stateless:
 
 * Statelessness helps in scaling the APIs to millions of concurrent users by deploying it to multiple servers. Any server can handle any request because there is no session related dependency.
@@ -47,10 +55,14 @@ There are some very noticeable advantage for having REST APIs stateless:
 
 We can implement caching on the GET endpoints with using one of the third party caching framework on the web application server.
 
-There are constraints on the POST endpoint query parameters to make the application stable.
+There are constraints on the POST endpoint query parameters in order to make the application stable.
 
 The system database is H2. It is a memory-based database therefore if the application is stopped, we lose the data.
-NoSQL / RDMS database or column base databases might be used based on the detail requirements. 
+There are different type of modern database such as NoSQL, RDMS database or column base databases. We can choose one of them based on data insertion and update frequency, ACID compliance and analytical/transactional app. 
 
-The system used native queries for getting optimum performance, and it is set the Isolation level Isolation.REPEATABLE_READ. 
-This provides the system access data without reading dirty data.
+Each of simulation records entered H2 database transactional and each read from H2 database Isolation level is Isolation.REPEATABLE_READ. 
+This setup provides basically free from dirty reading data from H2 environment on concurrent reading.
+
+Spring framework Global exception handling is used on the solution. The advantage of global exception handling is all the code necessary for handling any kind of error in the application.
+
+Spring validation annotations are used in order to checks and validate user inputs.
